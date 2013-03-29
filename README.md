@@ -1,4 +1,3 @@
-sixarm_libreoffice_helpers
-==========================
+# SixArm » LibreOffice » Helpers
 
-SixArm » LibreOffice » Helpers
+This repo is a placeholder for helpers for LibreOffice.
