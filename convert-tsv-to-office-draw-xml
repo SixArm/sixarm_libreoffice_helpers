@@ -1,0 +1,67 @@
+#!/bin/bash
+#
+# Convert data from Tab Separated Value (TSV) to LibreOffice Draw XML.
+#
+#   1. For each TSV input line, draw a box.
+#   2. Split the line into items i.e. fields.
+#   3. For each item, create a paragraph in the box.
+# 
+# You can tweak the settings for the box unit (e.g. we use centimeters),
+# the box width and height, the box position using x and y coordinates,
+# and the x and y step (i.e. offset spacing) to add to each new box.
+#
+# Example TSV input:
+#
+#    Alice   Anderson
+#    Bob     Brown
+#    Carol   Clark
+#
+#
+# Example diagram result:
+#
+#    #################
+#    #               #
+#    #     Alice     #
+#    #    Anderson   #
+#    #               #
+#    #################
+#    
+#    #################
+#    #               #
+#    #      Bob      #
+#    #     Brown     #
+#    #               #
+#    #################
+#
+#    #################
+#    #               #
+#    #     Carol     #
+#    #     Clark     #
+#    #               #
+#    #################
+#
+##
+
+box_unit="cm"
+
+box_width=4.000
+box_height=2.000
+
+box_x=1.000
+box_y=1.000
+
+box_x_step=0.000
+box_y_step=2.500
+
+while read line; do
+  line=${line// & / &amp; }
+  IFS=$'\t' read -a items <<< "${line}"
+  echo "    <draw:custom-shape draw:style-name=\"gr1\" draw:text-style-name=\"P1\" draw:layer=\"layout\" svg:width=\"$box_width$box_unit\" svg:height=\"$box_height$box_unit\" svg:x=\"$box_x$box_unit\" svg:y=\"$box_y$box_unit\">"
+  echo "     <draw:enhanced-geometry svg:viewBox=\"0 0 21600 21600\" draw:type=\"rectangle\" draw:enhanced-path=\"M 0 0 L 21600 0 21600 21600 0 21600 0 0 Z N\"/>"
+  for item in "${items[@]}"; do
+    echo "     <text:p text:style-name=\"P1\">${item}</text:p>"
+    box_x=$(echo "$box_x + $box_x_step" | bc)
+    box_y=$(echo "$box_y + $box_y_step" | bc)
+  done
+  echo "    </draw:custom-shape>"
+done
